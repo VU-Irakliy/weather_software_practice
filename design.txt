@@ -1,0 +1,17 @@
+
+Image of weather
+
+country             Image of WMO 
+*state             
+city                Temperature   Unit of degree
+                    text of WMO
+
+
+Future weather hourly
+..........
+images
+max weather
+min weather
+
+
+Future weather other days
