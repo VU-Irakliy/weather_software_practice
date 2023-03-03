@@ -42,16 +42,26 @@ def get_the_weather_status(number):
     }
     return switcher.get(number, 'Ooops, something went wrong.')
 
+def convert_the_time(string):
+    date_parts = string.split('T')
+    formatted_time = datetime.datetime.strptime(date_parts[0],'%Y-%m-%d')
+    date= formatted_time.strftime('%d-%m-%Y')
+    return [date, date_parts[1]]
 
 def sort_data(data):
     timezone, time_abbr = data["timezone"], data['timezone_abbreviation']
     cur_data = data['current_weather']
-    current_temperature, weathercode, wind_speed = cur_data['temperature'], cur_data['weathercode'], cur_data['windspeed']
-    return timezone, time_abbr, current_temperature, weathercode, wind_speed
+    cur_data_sorted = [cur_data['temperature'], cur_data['weathercode'], cur_data['windspeed'], cur_data['time']]
+    hourly_data = data['hourly']
+    print(hourly_data)
+    
+    return timezone, time_abbr, cur_data_sorted
     ...
 
 def create_the_weather_display(window, data, location):
-    timezone, time_abbr, current_temperature, weathercode, wind_speed = sort_data(data)
+    timezone, time_abbr, cur_data = sort_data(data)
+    current_temperature, weathercode, wind_speed, unform_time = cur_data
+    time = convert_the_time(unform_time)
     weather_status = get_the_weather_status(weathercode)
     # print(type(current_temperature))
     ######### y = 200 is the starting line
@@ -80,6 +90,17 @@ def create_the_weather_display(window, data, location):
     status_text.config(font= ("Davish", 15), fg = "black")
     status_text.place_configure(x= 100, y= 400)
     status_text.config(state=DISABLED)
+
+
+    local_time = Text(window, height=2, width=len(time[0]))
+    local_time.insert(END, time[0] + '\n' + time[1])
+    local_time.config(font= ("Davish", 15), fg = "black")
+    local_time.place_configure(x = 300, y= 200)
+    local_time.config(state=DISABLED)
+
+
+
+
 
     ...
 
@@ -129,7 +150,7 @@ def get_weather_data(location):
     # fhr = ''
     # if fahren_flag == True:
         # fhr = '&temperature_unit=fahrenheit'
-    URL_weather = "https://api.open-meteo.com/v1/forecast?latitude="+ str(location_data[1]) + "&longitude="+ str(location_data[0]) +"&current_weather=true&timezone=auto" ##"&hourly=temperature_2m&current_weather=true"##
+    URL_weather = "https://api.open-meteo.com/v1/forecast?latitude="+ str(location_data[1]) + "&longitude="+ str(location_data[0]) +"&current_weather=true&hourly=temperature_2m&timezone=auto" ##"&hourly=temperature_2m&current_weather=true"##
     
     response = requests.get(URL_weather)
     data = response.json()
@@ -155,7 +176,7 @@ def show_the_weather(window, input):
     if result == None:
         print("Oops. There is an error.\nCheck the spelling or existence of such location.")
         return
-    print(result)
+    # print(result)
     
     
 
