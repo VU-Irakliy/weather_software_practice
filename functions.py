@@ -8,40 +8,39 @@ import os
 import requests
 import json
 import platform
-#######SORT DATA AND UI OF WEATHER################################################################
-def get_the_weather_status(number):
-    switcher = {
-        0: 'Clear Sky',
-        1: 'Mostly Clear Sky',
-        2: 'Partly Cloudy',
-        3: 'Overcast',
-        45: 'Foggy',
-        48: 'Depositing Rime Fog',
-        51: 'Light Drizzle',
-        53: 'Moderate Drizzle',
-        55: "Dense Drizzle",
-        56: 'Light Freezing Drizzle',
-        57: 'Heavy Freezing Drizzle',
-        61: 'Slight Rain',
-        63: 'Moderate Rain',
-        65: 'Heavy Rain',
-        66: 'Slight Freezing Rain',
-        67: 'Heavy Freezing Rain',
-        71: 'Slight Snow Fall',
-        73: 'Moderate Snow Fall',
-        75: 'Heavy Snow Fall',
-        77: 'Snow Grains',
-        80: 'Slight Rain Showers',
-        81: 'Moderate Rain Showers',
-        82: 'Violent Rain Showers',
-        85: 'Slight Snow Showers',
-        86: 'Heavy Snow Showers',
-        95: 'Thunderstorm',
-        96: 'Thunderstorm With Slight Hail',
-        99: 'Thunderstorm With Heavy Hail'
-    }
-    return switcher.get(number, 'Ooops, something went wrong.')
 
+def get_the_weather_status(number):
+        switcher = {
+            0: 'Clear Sky',
+            1: 'Mostly Clear Sky',
+            2: 'Partly Cloudy',
+            3: 'Overcast',
+            45: 'Foggy',
+            48: 'Depositing Rime Fog',
+            51: 'Light Drizzle',
+            53: 'Moderate Drizzle',
+            55: "Dense Drizzle",
+            56: 'Light Freezing Drizzle',
+            57: 'Heavy Freezing Drizzle',
+            61: 'Slight Rain',
+            63: 'Moderate Rain',
+            65: 'Heavy Rain',
+            66: 'Slight Freezing Rain',
+            67: 'Heavy Freezing Rain',
+            71: 'Slight Snow Fall',
+            73: 'Moderate Snow Fall',
+            75: 'Heavy Snow Fall',
+            77: 'Snow Grains',
+            80: 'Slight Rain Showers',
+            81: 'Moderate Rain Showers',
+            82: 'Violent Rain Showers',
+            85: 'Slight Snow Showers',
+            86: 'Heavy Snow Showers',
+            95: 'Thunderstorm',
+            96: 'Thunderstorm With Slight Hail',
+            99: 'Thunderstorm With Heavy Hail'
+        }
+        return switcher.get(number, 'Ooops, something went wrong.')
 def convert_the_time(string):
     date_parts = string.split('T')
     formatted_time = datetime.datetime.strptime(date_parts[0],'%Y-%m-%d')
@@ -53,58 +52,17 @@ def sort_data(data):
     cur_data = data['current_weather']
     cur_data_sorted = [cur_data['temperature'], cur_data['weathercode'], cur_data['windspeed'], cur_data['time']]
     hourly_data = data['hourly']
-    print(hourly_data)
+    # print(hourly_data)
     
-    return timezone, time_abbr, cur_data_sorted
-    ...
+    return timezone, time_abbr, cur_data_sorted, hourly_data
 
-def create_the_weather_display(window, data, location):
-    timezone, time_abbr, cur_data = sort_data(data)
-    current_temperature, weathercode, wind_speed, unform_time = cur_data
-    time = convert_the_time(unform_time)
-    weather_status = get_the_weather_status(weathercode)
-    # print(type(current_temperature))
-    ######### y = 200 is the starting line
-    ct = Text(window, height=1, width=7, bg='white')
-    ct.insert(END, str(current_temperature) + '°C')
-    ct.config(font= ("Grotesco", 30, 'bold'), fg = "black")
-    ct.place_configure(x= 100, y= 200)
-    ct.config(state=DISABLED)
+def sort_hourly_data(data, current_date, current_hour):
+    time, temperature = data['time'], data['temperature_2m']
+    print(len(time), len(temperature))
+    formatted_time = [convert_the_time(t) for t in time]
+    print(formatted_time)
+    return formatted_time
 
-    if location[1] == 'United States':
-
-        city = Text(window, height=4, width=20, bg='white')
-        city.insert(END, location[0] + '\n' + location[2] + '\n' + location[1])
-        city.config(font= ("Davish", 20), fg = "black")
-        city.place_configure(x= 100, y= 270)
-        city.config(state=DISABLED)
-    else:
-        city = Text(window, height=3, width=20, bg='white')
-        city.insert(END, location[0] + '\n' + location[1])
-        city.config(font= ("Davish", 20), fg = "black")
-        city.place_configure(x= 100, y= 270)
-        city.config(state=DISABLED)
-
-    status_text = Text(window, height=1, width=len(weather_status), bg='white')
-    status_text.insert(END, weather_status)
-    status_text.config(font= ("Davish", 15), fg = "black")
-    status_text.place_configure(x= 100, y= 400)
-    status_text.config(state=DISABLED)
-
-
-    local_time = Text(window, height=2, width=len(time[0]))
-    local_time.insert(END, time[0] + '\n' + time[1])
-    local_time.config(font= ("Davish", 15), fg = "black")
-    local_time.place_configure(x = 300, y= 200)
-    local_time.config(state=DISABLED)
-
-
-
-
-
-    ...
-
-###########DATA ACQUIREMENT#######################################################################################################
 
 def get_location_data(input):
     city, country, US_state = input
@@ -138,11 +96,11 @@ def get_location_data(input):
 
     print(len(data))
     return longitude, latitude
-    
 
-def get_weather_data(location):
+
+def get_weather_data(location_data):
     # get_location_data(location)
-    location_data = get_location_data(location)
+    
     print(location_data)
     if location_data == (None, None):
         return None
@@ -165,14 +123,109 @@ def get_weather_data(location):
     ...
 
 
-###########MAIN  FUNCTION#########################################################################################################
+
+######################################################################################################################
 def show_the_weather(window, input):
+    ct = Text(window, height=1, width=7, bg='white')
+    city = Text(window, height=4, width=20, bg='white')
+    status_text = Text(window, height=1, width=0, bg='white')
+    local_time = Text(window, height=2, width=0)
+    time_zone = Text(window, height=1, width=0)
+    last_update = Text(window, height=1, width=0, bg='white')
+
+   
+    def create_the_weather_display(window, data, location, current_hour, current_date):
+        timezone, time_abbr, cur_data, hourly_data = sort_data(data)
+        current_temperature, weathercode, wind_speed, unform_time = cur_data
+
+        time = convert_the_time(unform_time)
+        weather_status = get_the_weather_status(weathercode)
+        new_hourly_data = sort_hourly_data(hourly_data, current_date, current_hour)
+        
+        # print(type(current_temperature))
+        
+        ###################################################################
+
+        # if ct.winfo_exists():
+        #     print('Boom')
+        #     ...
+        
+        ######### y = 200 is the starting line
+        ct.pack()
+        ct.config(state=NORMAL)
+        ct.delete('1.0',END)
+        ct.insert(END, str(current_temperature) + '°C')
+        ct.config(font= ("Grotesco", 30, 'bold'), fg = "black")
+        ct.place_configure(x= 100, y= 200)
+        ct.config(state=DISABLED)
+
+        if location[1] == 'United States':
+            city.pack()
+            city.config(state=NORMAL)
+            city.delete('1.0',END)
+            city.insert(END, location[0] + '\n' + location[2] + '\n' + location[1])
+            city.config(font= ("Davish", 20), fg = "black")
+            city.place_configure(x= 100, y= 270)
+            city.config(state=DISABLED)
+        else:
+            city.pack()
+            city.config(state=NORMAL)
+            city.delete('1.0',END)
+            city.insert(END, location[0] + '\n' + location[1])
+            city.config(font= ("Davish", 20), fg = "black")
+            city.place_configure(x= 100, y= 270)
+            city.config(state=DISABLED)
+
+        # status_text.destroy()
+        # status_text = Text(window, height=1, width=0, bg='white')
+        status_text.pack()
+        status_text.config(state=NORMAL)
+        status_text.delete('1.0',END)
+        status_text.config(width=len(weather_status))
+        status_text.insert(END, weather_status)
+        status_text.config(font= ("Davish", 15), fg = "black")
+        status_text.place_configure(x= 100, y= 400)
+        status_text.config(state=DISABLED)
+
+        local_time.pack()
+        local_time.config(state=NORMAL)
+        local_time.delete('1.0',END)
+        local_time.config(width=len(time[0]))
+        local_time.insert(END, time[0] + '\n' + time[1])
+        local_time.config(font= ("Davish", 15), fg = "black")
+        local_time.place_configure(x = 300, y= 200)
+        local_time.config(state=DISABLED)
+
+        time_zone.pack()
+        time_zone.config(state=NORMAL)
+        time_zone.delete('1.0',END)
+        time_zone.config(width=len(timezone) + 10)
+        time_zone.insert(END, 'Timezone: '+ timezone)
+        time_zone.config(font= ("Davish", 10), fg = "black")
+        time_zone.place_configure(x = 300, y= 175)
+        time_zone.config(state=DISABLED)
+
+    def refresh(event=None):
+        
+        current_time  = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        current_date, current_hour = current_time.split(" ")
+        result = get_weather_data(location_data)
+        create_the_weather_display(window, result, input, current_hour, current_date)
+        last_update.pack()
+        last_update.config(state=NORMAL)
+        last_update.delete('1.0',END)
+        last_update.insert(END, 'Last updated: ' + current_time)
+        last_update.config(state=DISABLED)
+        
+
+   
     # input = 
     # fahren_flag = False
     # if input[1] == "United States":
     #     print("HS")
     #     fahren_flag == True
-    result = get_weather_data(input)
+    location_data = get_location_data(input)
+    result = get_weather_data(location_data)
     if result == None:
         print("Oops. There is an error.\nCheck the spelling or existence of such location.")
         return
@@ -180,9 +233,24 @@ def show_the_weather(window, input):
     
     
 
-    
+    current_time  = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    current_date, current_hour = current_time.split(" ")
+    print(current_date, current_hour)
     # cur_weather = 
     ##
-    create_the_weather_display(window, result, input)
+    create_the_weather_display(window, result, input, current_hour, current_date)
+
+    last_update.config(state=NORMAL)
+    last_update.config(width=len(current_time) + 12)
+    last_update.insert(END, 'Last updated: ' + current_time)
+    last_update.config(font= ("Davish", 10), fg = "black")
+    last_update.place_configure(x= 50, y= 455)
+    last_update.config(state=DISABLED)
+
+    refresh_button = Button(window, text = 'Refresh')
+    refresh_button.bind('<Button-1>', refresh)
+    refresh_button.place_configure(x= 310, y= 450)
     
     ...
+
+

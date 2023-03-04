@@ -22,7 +22,7 @@ def get_me_the_current_time():
 
     current_time = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     current_time_visual.config(state=NORMAL)
-    current_time_visual.delete("1.0", END)
+    current_time_visual.delete('1.0',END)
     current_time_visual.insert(END, current_time)
     current_time_visual.config(font= ("Times New Roman", 14), fg = "black")
     current_time_visual.place_configure(x = (window.winfo_width() - 230), y = 10) #1280 - 1050 = 230
