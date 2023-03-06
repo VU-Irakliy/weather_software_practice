@@ -11,11 +11,6 @@ URL_location = "https://geocoding-api.open-meteo.com/v1/search"
 time_len = len(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
 
 
-window = Tk()
-window.title("Weather App")
-window.geometry("1280x720")
-
-window.update()
 
 #################################################################################################################################################
 def get_me_the_current_time():
@@ -29,13 +24,13 @@ def get_me_the_current_time():
     current_time_visual.config(state=DISABLED)
     window.after(1000, get_me_the_current_time)
 
+
+
 def weather_button_clicked(event = None):
     show_the_weather(window, [input_field_city.get(), input_field_country.get().title(), input_field_state.get().title()])
 
 
 #################################################################################################################################################
-
-
 
 
 

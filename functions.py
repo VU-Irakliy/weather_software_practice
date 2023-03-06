@@ -9,6 +9,18 @@ import requests
 import json
 import platform
 
+window = Tk()
+window.title("Weather App")
+window.geometry("1280x720")
+
+window.update()
+ct = Text(window, height=1, width=7, bg='white')
+city = Text(window, height=4, width=20, bg='white')
+status_text = Text(window, height=1, width=0, bg='white')
+local_time = Text(window, height=2, width=0)
+time_zone = Text(window, height=1, width=0)
+last_update = Text(window, height=1, width=0, bg='white')
+
 def get_the_weather_status(number):
         switcher = {
             0: 'Clear Sky',
@@ -125,14 +137,10 @@ def get_weather_data(location_data):
 
 
 ######################################################################################################################
-def show_the_weather(window, input):
-    ct = Text(window, height=1, width=7, bg='white')
-    city = Text(window, height=4, width=20, bg='white')
-    status_text = Text(window, height=1, width=0, bg='white')
-    local_time = Text(window, height=2, width=0)
-    time_zone = Text(window, height=1, width=0)
-    last_update = Text(window, height=1, width=0, bg='white')
 
+
+def show_the_weather(window, input):
+   
    
     def create_the_weather_display(window, data, location, current_hour, current_date):
         timezone, time_abbr, cur_data, hourly_data = sort_data(data)
@@ -142,25 +150,25 @@ def show_the_weather(window, input):
         weather_status = get_the_weather_status(weathercode)
         new_hourly_data = sort_hourly_data(hourly_data, current_date, current_hour)
         
-        # print(type(current_temperature))
+        
         
         ###################################################################
-
-        # if ct.winfo_exists():
-        #     print('Boom')
-        #     ...
         
         ######### y = 200 is the starting line
-        ct.pack()
+       
+        global ct, city, status_text, local_time, time_zone
+        ct.destroy()
+        ct = Text(window, height=1, width=7, bg='white')
         ct.config(state=NORMAL)
         ct.delete('1.0',END)
         ct.insert(END, str(current_temperature) + '°C')
         ct.config(font= ("Grotesco", 30, 'bold'), fg = "black")
         ct.place_configure(x= 100, y= 200)
         ct.config(state=DISABLED)
-
+        
+        city.destroy()
+        city = Text(window, height=4, width=20, bg='white')
         if location[1] == 'United States':
-            city.pack()
             city.config(state=NORMAL)
             city.delete('1.0',END)
             city.insert(END, location[0] + '\n' + location[2] + '\n' + location[1])
@@ -168,26 +176,28 @@ def show_the_weather(window, input):
             city.place_configure(x= 100, y= 270)
             city.config(state=DISABLED)
         else:
-            city.pack()
             city.config(state=NORMAL)
             city.delete('1.0',END)
             city.insert(END, location[0] + '\n' + location[1])
             city.config(font= ("Davish", 20), fg = "black")
             city.place_configure(x= 100, y= 270)
             city.config(state=DISABLED)
-
-        # status_text.destroy()
-        # status_text = Text(window, height=1, width=0, bg='white')
-        status_text.pack()
+        
+        global status_text
+        status_text.destroy()
+        status_text = Text(window, height=1, width=0, bg='white')
+        # status_text.()
         status_text.config(state=NORMAL)
         status_text.delete('1.0',END)
         status_text.config(width=len(weather_status))
+        # status_text.config(text= weather_status)
         status_text.insert(END, weather_status)
         status_text.config(font= ("Davish", 15), fg = "black")
-        status_text.place_configure(x= 100, y= 400)
+        status_text.place_configure(x= 100, y= 410)
         status_text.config(state=DISABLED)
 
-        local_time.pack()
+        local_time.destroy()
+        local_time = Text(window, height=2, width=0)
         local_time.config(state=NORMAL)
         local_time.delete('1.0',END)
         local_time.config(width=len(time[0]))
@@ -196,7 +206,8 @@ def show_the_weather(window, input):
         local_time.place_configure(x = 300, y= 200)
         local_time.config(state=DISABLED)
 
-        time_zone.pack()
+        time_zone.destroy()
+        time_zone = Text(window, height=1, width=0)
         time_zone.config(state=NORMAL)
         time_zone.delete('1.0',END)
         time_zone.config(width=len(timezone) + 10)
@@ -211,10 +222,15 @@ def show_the_weather(window, input):
         current_date, current_hour = current_time.split(" ")
         result = get_weather_data(location_data)
         create_the_weather_display(window, result, input, current_hour, current_date)
-        last_update.pack()
+        # last_update.()
+        global last_update
+        last_update.destroy()
+        last_update = Text(window, height=1, width=0, bg='white')
         last_update.config(state=NORMAL)
-        last_update.delete('1.0',END)
+        last_update.config(width=len(current_time) + 12)
         last_update.insert(END, 'Last updated: ' + current_time)
+        last_update.config(font= ("Davish", 10), fg = "black")
+        last_update.place_configure(x= 50, y= 455)
         last_update.config(state=DISABLED)
         
 
@@ -239,7 +255,9 @@ def show_the_weather(window, input):
     # cur_weather = 
     ##
     create_the_weather_display(window, result, input, current_hour, current_date)
-
+    global last_update
+    last_update.destroy()
+    last_update = Text(window, height=1, width=0, bg='white')
     last_update.config(state=NORMAL)
     last_update.config(width=len(current_time) + 12)
     last_update.insert(END, 'Last updated: ' + current_time)
@@ -252,5 +270,4 @@ def show_the_weather(window, input):
     refresh_button.place_configure(x= 310, y= 450)
     
     ...
-
 

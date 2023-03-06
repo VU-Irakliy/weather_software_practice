@@ -18,3 +18,51 @@ min weather
 
 
 Future weather other days
+
+Current temperature is retrieved through function, that I will not mention, since it's irrelevant
+Why there is an overlay?
+Here, you can see if you get status_text box after you search once, but if you search another city, status_text overlaps itself. It can be sees, if you have a smaller sentence pop up, the previous one still exists.
+Why it puts another text box, instead of editing the text box? 
+window = Tk()
+window.title("Weather App")
+window.geometry("1280x720")
+
+window.update()
+status_text = Text(window, height=1, width=0, bg='white')
+
+
+def weather_button_clicked(event = None):
+    show_the_weather(window, [input_field_city.get(), input_field_country.get().title(), input_field_state.get().title()])
+
+def show_the_weather(window, input):
+        weather_status = function(input)
+        status_text.config(state=NORMAL)
+        status_text.delete('1.0',END)
+        status_text.config(width=len(weather_status))
+        status_text.insert(END, weather_status)
+        status_text.config(font= ("Davish", 15), fg = "black")
+        status_text.place_configure(x= 100, y= 400)
+        status_text.config(state=DISABLED)
+
+input_field_city = Entry(window)
+input_field_city.config(width= 30)
+input_field_city.insert(0, "Enter City Here")
+input_field_city.place_configure(x = (window.winfo_width()/2 - 150), y = 50)
+
+
+input_field_country = Entry(window)
+input_field_country.config(width= 30)
+input_field_country.insert(0, "Enter Country Here")
+input_field_country.place_configure(x = (window.winfo_width()/2 - 150), y = 80)
+
+
+input_field_state = Entry(window)
+input_field_state.config(width= 30)
+input_field_state.insert(0, "Enter US State Here (Optional)")
+input_field_state.place_configure(x = (window.winfo_width()/2 - 150), y = 110)
+
+
+weather_button = Button(window, text = "Search")
+weather_button.bind("<Button-1>", weather_button_clicked)
+weather_button.place_configure(x = (window.winfo_width()/2) + 150, y = 80 )
+window.mainloop()
