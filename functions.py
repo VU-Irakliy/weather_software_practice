@@ -88,6 +88,7 @@ def sort_hourly_data(data, current_date, current_time):
 def get_location_data(input):
     city, country, US_state = input
     URL_location = "https://geocoding-api.open-meteo.com/v1/search?name="+city
+    #NEED TO HANDLE CONNECTION ERROR
     response = requests.get(URL_location)
     data = response.json()
     longitude = None
@@ -271,6 +272,7 @@ def show_the_weather(window, input):
     #     fahren_flag == True
     location_data = get_location_data(input)
     result = get_weather_data(location_data)
+    #need TO OUTPUT AN ERROR
     if result == None:
         print("Oops. There is an error.\nCheck the spelling or existence of such location.")
         return
