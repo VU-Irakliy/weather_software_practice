@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 # import sys
 # from PyQt5.QtWidgets import QApplication, QWidget
 import datetime
+import pytz
 import os
 import requests
 import json
@@ -17,9 +18,11 @@ window.update()
 ct = Text(window, height=1, width=7, bg='white')
 city = Text(window, height=4, width=20, bg='white')
 status_text = Text(window, height=1, width=0, bg='white')
-local_time = Text(window, height=2, width=0)
+local_time_text = Text(window, height=2, width=0)
 time_zone = Text(window, height=1, width=0)
 last_update = Text(window, height=1, width=0, bg='white')
+hourly_text_box = Text(window, height=11, width=23)
+# hourly_frame = Frame(window, bg='blue')
 
 def get_the_weather_status(number):
         switcher = {
@@ -68,12 +71,18 @@ def sort_data(data):
     
     return timezone, time_abbr, cur_data_sorted, hourly_data
 
-def sort_hourly_data(data, current_date, current_hour):
+def sort_hourly_data(data, current_date, current_time):
     time, temperature = data['time'], data['temperature_2m']
-    print(len(time), len(temperature))
+    # print(len(time), len(temperature))
     formatted_time = [convert_the_time(t) for t in time]
-    print(formatted_time)
-    return formatted_time
+    current_hour = current_time[0:2] + ':00'
+    nec_index = formatted_time.index([current_date, current_hour])
+    formatted_time = formatted_time[(nec_index +1):(nec_index + 25)]
+    formatted_time = [i[1] for i in formatted_time]
+    formatted_temperature = temperature[(nec_index + 1):(nec_index+25)]
+    # print(nec_index)
+    # print(formatted_time)
+    return formatted_time, formatted_temperature
 
 
 def get_location_data(input):
@@ -142,13 +151,14 @@ def get_weather_data(location_data):
 def show_the_weather(window, input):
    
    
-    def create_the_weather_display(window, data, location, current_hour, current_date):
+    def create_the_weather_display(window, data, location, local_time, local_date):
         timezone, time_abbr, cur_data, hourly_data = sort_data(data)
         current_temperature, weathercode, wind_speed, unform_time = cur_data
 
         time = convert_the_time(unform_time)
         weather_status = get_the_weather_status(weathercode)
-        new_hourly_data = sort_hourly_data(hourly_data, current_date, current_hour)
+        hourly_time, hourly_temperature = sort_hourly_data(hourly_data, local_date, local_time)
+        
         
         
         
@@ -156,7 +166,7 @@ def show_the_weather(window, input):
         
         ######### y = 200 is the starting line
        
-        global ct, city, status_text, local_time, time_zone
+        global ct, city, status_text, local_time_text, time_zone, hourly_text_box
         ct.destroy()
         ct = Text(window, height=1, width=7, bg='white')
         ct.config(state=NORMAL)
@@ -196,15 +206,15 @@ def show_the_weather(window, input):
         status_text.place_configure(x= 100, y= 410)
         status_text.config(state=DISABLED)
 
-        local_time.destroy()
-        local_time = Text(window, height=2, width=0)
-        local_time.config(state=NORMAL)
-        local_time.delete('1.0',END)
-        local_time.config(width=len(time[0]))
-        local_time.insert(END, time[0] + '\n' + time[1])
-        local_time.config(font= ("Davish", 15), fg = "black")
-        local_time.place_configure(x = 300, y= 200)
-        local_time.config(state=DISABLED)
+        local_time_text.destroy()
+        local_time_text = Text(window, height=2, width=0)
+        local_time_text.config(state=NORMAL)
+        local_time_text.delete('1.0',END)
+        local_time_text.config(width=len(time[0]))
+        local_time_text.insert(END, time[0] + '\n' + time[1])
+        local_time_text.config(font= ("Davish", 15), fg = "black")
+        local_time_text.place_configure(x = 300, y= 200)
+        local_time_text.config(state=DISABLED)
 
         time_zone.destroy()
         time_zone = Text(window, height=1, width=0)
@@ -216,12 +226,31 @@ def show_the_weather(window, input):
         time_zone.place_configure(x = 300, y= 175)
         time_zone.config(state=DISABLED)
 
+        hourly_string = ''
+        for i in range(0, len(hourly_time), 6):
+            time_row = " ".join(hourly_time[i:i+6])
+            temp_row = "   ".join(str(temp) for temp in hourly_temperature[i:i+6])
+            hourly_string += f'{time_row}\n{temp_row}\n\n'
+
+        hourly_text_box.destroy()
+        hourly_text_box = Text(window, height=11, width=30)
+        hourly_text_box.config(state=NORMAL)
+        hourly_text_box.delete('1.0',END)
+       
+        hourly_text_box.insert(END, hourly_string)
+        hourly_text_box.config(font= ("Davish", 12), fg = "black")
+        hourly_text_box.place_configure(x = 700, y= 200)
+        hourly_text_box.config(state=DISABLED)
+
+
+
     def refresh(event=None):
         
-        current_time  = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-        current_date, current_hour = current_time.split(" ")
+        local_timezone = pytz.timezone(result['timezone'])
+        local_datetime = datetime.datetime.now(local_timezone).strftime("%d-%m-%Y %H:%M:%S")
+        local_date, local_hour = local_datetime.split(" ")
         result = get_weather_data(location_data)
-        create_the_weather_display(window, result, input, current_hour, current_date)
+        create_the_weather_display(window, result, input, local_hour, local_date)
         # last_update.()
         global last_update
         last_update.destroy()
@@ -250,11 +279,14 @@ def show_the_weather(window, input):
     
 
     current_time  = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    local_timezone = pytz.timezone(result['timezone'])
+    local_datetime = datetime.datetime.now(local_timezone).strftime("%d-%m-%Y %H:%M:%S")
     current_date, current_hour = current_time.split(" ")
+    local_date, local_hour = local_datetime.split(" ")
     print(current_date, current_hour)
     # cur_weather = 
     ##
-    create_the_weather_display(window, result, input, current_hour, current_date)
+    create_the_weather_display(window, result, input,local_hour, local_date)
     global last_update
     last_update.destroy()
     last_update = Text(window, height=1, width=0, bg='white')
