@@ -10,7 +10,7 @@ Recommended versions:
 <br>
 Python 3.8.10
 <br>
-Tkinter 8.6
+Tkinter 8.6 (it's a built-in library)
 <br><br>
 How To Start a Program: Launch start.py file.
 <br>
