@@ -54,7 +54,6 @@ enter_the_text_text = Text(window, height=1, width=36)
 enter_the_text_text.insert(END,text_ff )
 enter_the_text_text.config(font= ("Times New Roman", 14), fg = "black")
 enter_the_text_text.place_configure(x = (window.winfo_width()/2 - 150), y=1)
-# 
 
 
 input_field_city = Entry(window)
@@ -75,8 +74,6 @@ input_field_state.insert(0, "Enter US State Here (Optional)")
 input_field_state.place_configure(x = (window.winfo_width()/2 - 150), y = 110)
 
 
-# loc_input = ["Amsterdam", "Netherlands", ""]
-# weather_data = get_weather_data(loc_input)
 
 weather_button = Button(window, text = "Search")
 weather_button.bind("<Button-1>", weather_button_clicked)
@@ -84,32 +81,3 @@ weather_button.place_configure(x = (window.winfo_width()/2) + 150, y = 80 )
 
 
 window.mainloop()
-
-print('HOMIE')
-
-# width = window.winfo_width()
-#     height = window.winfo_height()
-# the_b = Button(window, text = "Sta")  ## , command = )
-# the_b.place_configure(x = 600,y = 360) 
-# the_b.pack()
-
-
-# window.resizable(False, False)
-# window.update_idletasks()
-# if platform.system() == "Windows":
-#     window.wm_minsize(800, 300)
-# else:
-#     window.minsize(800, 600)
-
-# new_frame = Frame(window,   bg="", highlightthickness=0, bd=0)
-# new_frame.pack(side='bottom', fill='x')
-# new_button = Button(new_frame, text="Help")
-# new_button.pack()
-
-# print("wjat+++", window.winfo_width())
-# i_need_a_background = os.getcwd()
-# background = i_need_a_background(f'images/background.jpg')
-# background = Image.open('images/background.jpg')
-
-# window.minsize(width=800,height= 600)
-# window.maxsize(width= 1440, height=900)

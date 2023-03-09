@@ -14,12 +14,11 @@ time_zone = Text(window, height=1, width=0)
 last_update = Text(window, height=1, width=0, bg='white')
 hourly_text_box = Text(window, height=11, width=23)
 error_message_text = Text(window, height=1, width=0)
-# hourly_frame = Frame(window, bg='blue')
+
 
 
 ######################################################################################################################
 def error_handle(result):
-    print('len of the result if error', result)
     if result == None:
         error_message = "Please, check for errors, typos, missing information and if this place exists."
         put_up_the_error(error_message)
@@ -86,10 +85,6 @@ def show_the_weather(window, input):
         hourly_time, hourly_temperature = sort_hourly_data(hourly_data, local_date, local_time)
         
         
-        
-        
-        ###################################################################
-        
         ######### y = 200 is the starting line
        
         global ct, city, status_text, local_time_text, time_zone, hourly_text_box
@@ -122,11 +117,9 @@ def show_the_weather(window, input):
         global status_text
         status_text.destroy()
         status_text = Text(window, height=1, width=0, bg='white')
-        # status_text.()
         status_text.config(state=NORMAL)
         status_text.delete('1.0',END)
         status_text.config(width=len(weather_status))
-        # status_text.config(text= weather_status)
         status_text.insert(END, weather_status)
         status_text.config(font= ("Davish", 15), fg = "black")
         status_text.place_configure(x= 100, y= 410)
@@ -181,8 +174,10 @@ def show_the_weather(window, input):
             return
         
         create_the_weather_display(window, result, input, local_hour, local_date)
-        # last_update.()
+
+        current_time  = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         global last_update
+
         last_update.destroy()
         last_update = Text(window, height=1, width=0, bg='white')
         last_update.config(state=NORMAL)
@@ -194,11 +189,7 @@ def show_the_weather(window, input):
         
 
    
-    # input = 
-    # fahren_flag = False
-    # if input[1] == "United States":
-    #     print("HS")
-    #     fahren_flag == True
+  
     if input[0] == 'Enter City Here' or input[1] == 'Enter Country Here':
         put_up_the_error(error_message='Please, provide a proper input.')
         return
@@ -207,21 +198,17 @@ def show_the_weather(window, input):
             put_up_the_error(error_message='Please, provide the US state')
     location_data = get_location_data(input)
     result = get_weather_data(location_data)
-    #need TO OUTPUT AN ERROR
+
     if error_handle(result):
         return
-    # print(result)
     
     
 
     current_time  = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     local_timezone = pytz.timezone(result['timezone'])
     local_datetime = datetime.datetime.now(local_timezone).strftime("%d-%m-%Y %H:%M:%S")
-    current_date, current_hour = current_time.split(" ")
     local_date, local_hour = local_datetime.split(" ")
-    print(current_date, current_hour)
-    # cur_weather = 
-    ##
+
     global error_message_text
     error_message_text.destroy()
     create_the_weather_display(window, result, input,local_hour, local_date)
