@@ -13,11 +13,66 @@ local_time_text = Text(window, height=2, width=0)
 time_zone = Text(window, height=1, width=0)
 last_update = Text(window, height=1, width=0, bg='white')
 hourly_text_box = Text(window, height=11, width=23)
+error_message_text = Text(window, height=1, width=0)
 # hourly_frame = Frame(window, bg='blue')
 
 
 ######################################################################################################################
+def error_handle(result):
+    print('len of the result if error', result)
+    if result == None:
+        error_message = "Please, check for errors, typos, missing information and if this place exists."
+        put_up_the_error(error_message)
+        return True
+    try: 
+        
+        if result[0] == 'location':
+            num = result[1]
+            if num == 503:
+                error_message = 'Error 503. Service Unavailable. Please, check your internet connection and try again.'
+            elif num == 204:
+                error_message = 'Error 204. There is no location data for this location. Please, check for errors and typos.'
+            elif num == 404:
+                error_message = 'Error 404. Not Found. The requested data could not be found. Please, check for errors and typos.' 
+            elif num == 500:
+                error_message = 'Error 500. Internal Service Error, when retrieving location data. Please, try again later.'
+            elif num == 400:
+                error_message = 'Error 400. This error should not come up. Contact me when you found vulnerability.'
+            else:
+                error_message = 'Unknown error in location retrieval.'
+            put_up_the_error(error_message)
+            return True
+        elif result[0] == 'weather':
+            num = result[1]
+            if num == 503:
+                error_message = 'Error 503. Service Unavailable. Please, check your internet connection and try again.'
+            elif num == 204:
+                error_message = 'Error 204. There is (currently) no weather data for this location.'
+            elif num == 404:
+                error_message = 'Error 404. Not Found. The requested data for this location could not be found.' 
+            elif num == 500:
+                error_message = 'Error 500. There is an Internal Service Error, when retrieving weather data. Please, try again later.'
+            elif num == 400:
+                error_message = 'Error 400. This error should not come up. Contact me when you found vulnerability.'
+            else:
+                error_message = 'Unknown error in weather retrieval.'
+            put_up_the_error(error_message)
+            return True
+    except KeyError:
+        pass
+    
+def put_up_the_error(error_message):
+    global window, error_message_text
+    error_message_text.destroy()
+    error_message_text = Text(window, height=1, width=len(error_message), bg='black')
+    error_message_text.config(state=NORMAL)
+    error_message_text.delete('1.0',END)
+    error_message_text.insert(END, error_message)
+    error_message_text.config(font= ("Davish", 9), fg = "red")
+    error_message_text.place_configure(x=700, y=170)
+    error_message_text.config(state=DISABLED)
 
+    ...
 
 def show_the_weather(window, input):
    
@@ -121,6 +176,10 @@ def show_the_weather(window, input):
         local_datetime = datetime.datetime.now(local_timezone).strftime("%d-%m-%Y %H:%M:%S")
         local_date, local_hour = local_datetime.split(" ")
         result = get_weather_data(location_data)
+        
+        if error_handle(result):
+            return
+        
         create_the_weather_display(window, result, input, local_hour, local_date)
         # last_update.()
         global last_update
@@ -140,11 +199,16 @@ def show_the_weather(window, input):
     # if input[1] == "United States":
     #     print("HS")
     #     fahren_flag == True
+    if input[0] == 'Enter City Here' or input[1] == 'Enter Country Here':
+        put_up_the_error(error_message='Please, provide a proper input.')
+        return
+    elif input[1] == 'United States':
+        if input[2] == 'Enter US State Here (Optional)':
+            put_up_the_error(error_message='Please, provide the US state')
     location_data = get_location_data(input)
     result = get_weather_data(location_data)
     #need TO OUTPUT AN ERROR
-    if result == None:
-        print("Oops. There is an error.\nCheck the spelling or existence of such location.")
+    if error_handle(result):
         return
     # print(result)
     
@@ -158,6 +222,8 @@ def show_the_weather(window, input):
     print(current_date, current_hour)
     # cur_weather = 
     ##
+    global error_message_text
+    error_message_text.destroy()
     create_the_weather_display(window, result, input,local_hour, local_date)
     global last_update
     last_update.destroy()
