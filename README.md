@@ -12,5 +12,7 @@ Python 3.8.10
 <br>
 Tkinter 8.6 (it's a built-in library)
 <br><br>
-How To Start a Program: Launch start.py file.
+How To Start a Program: Launch start.py file or just go to output/the_weather/ and launch the_weather.exe .
 <br>
+The performance is still buggy, but it's just a first project!
+<br> There will be more to come!
